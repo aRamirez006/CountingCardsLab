@@ -1,11 +1,11 @@
 package org.example.jmh;
 
-import org.example.GreetingGenerator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-import org.openjdk.jmh.annotations.Warmup;
 
 import java.util.concurrent.TimeUnit;
+
+import org.example.CountingCards;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -13,11 +13,33 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1, warmups = 2)
 @Warmup(iterations = 2)
 public class SampleBenchmark {
+  @Param({"100", "1000", "10000", "50000"})
+  int size;
+
+  CountingCards countingCards = new CountingCards();
+
   @Benchmark
   @Timeout(time = 5, timeUnit = TimeUnit.SECONDS)
-  public void sayHelloBenchmark(Blackhole bh) {
-      GreetingGenerator generator = new GreetingGenerator();
-      String output = generator.sayHello();
-      bh.consume(output);
+  public void shuffleSlow(Blackhole bh) {
+    Integer[] arr = new Integer[size];
+    for (int i = 0; i < size; i++) arr[i] = i;
+    bh.consume(countingCards.shuffleSlow(arr));
   }
+
+  @Benchmark
+  @Timeout(time = 5, timeUnit = TimeUnit.SECONDS)
+  public void shuffleBetter(Blackhole bh) {
+    Integer[] arr = new Integer[size];
+    for (int i = 0; i < size; i++) arr[i] = i;
+    bh.consume(countingCards.shuffleBetter(arr));
+  }
+
+  @Benchmark
+  @Timeout(time = 5, timeUnit = TimeUnit.SECONDS)
+  public void shuffleBest(Blackhole bh) {
+    Integer[] arr = new Integer[size];
+    for (int i = 0; i < size; i++) arr[i] = i;
+    bh.consume(countingCards.shuffleBest(arr));
+  }
+
 }
